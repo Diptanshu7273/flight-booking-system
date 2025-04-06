@@ -1,7 +1,8 @@
-const express = require("express");
+import express from "express";
+import { bookFlight } from "../controllers/bookingController.js";
+
 const router = express.Router();
-const { bookFlight } = require("../controllers/bookingController");
 
-router.post("/", bookFlight); // Ensure this is present
+router.post("/", bookFlight);
 
-module.exports = router;
+export default router;

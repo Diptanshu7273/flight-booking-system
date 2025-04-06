@@ -1,6 +1,6 @@
-const express = require("express");
-const { authMiddleware, adminMiddleware } = require("../middlewares/authMiddleware");
-const { addFlight, updateFlight, deleteFlight, getFlights, searchFlights} = require("../controllers/flightController");
+import express from "express";
+import { authMiddleware, adminMiddleware } from "../middlewares/authMiddleware.js";
+import { addFlight, updateFlight, deleteFlight, getFlights, searchFlights } from "../controllers/flightController.js";
 
 const router = express.Router();
 
@@ -10,4 +10,4 @@ router.post("/", authMiddleware, adminMiddleware, addFlight);
 router.put("/:id", authMiddleware, adminMiddleware, updateFlight);
 router.delete("/:id", authMiddleware, adminMiddleware, deleteFlight);
 
-module.exports = router;
+export default router;

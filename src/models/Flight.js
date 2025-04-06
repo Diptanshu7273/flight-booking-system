@@ -1,5 +1,5 @@
-const { Sequelize, DataTypes } = require("sequelize");
-const { sequelize } = require("../config/db");
+import { Sequelize, DataTypes } from "sequelize";
+import { sequelize } from "../config/db.js"; // Add .js extension for ESM
 
 const Flight = sequelize.define("Flight", {
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -12,10 +12,13 @@ const Flight = sequelize.define("Flight", {
   total_seats: { type: DataTypes.INTEGER, allowNull: false },
   available_seats: { type: DataTypes.INTEGER, allowNull: false },
   price: { type: DataTypes.FLOAT, allowNull: false },
-  created_at: { type: DataTypes.DATE, defaultValue: Sequelize.literal("CURRENT_TIMESTAMP") },
+  created_at: {
+    type: DataTypes.DATE,
+    defaultValue: Sequelize.literal("CURRENT_TIMESTAMP")
+  },
 }, {
-  tableName: "flights", // Ensure table name matches MySQL
-  timestamps: false // Since `created_at` is handled manually
+  tableName: "flights",
+  timestamps: false
 });
 
-module.exports = Flight;
+export default Flight;
