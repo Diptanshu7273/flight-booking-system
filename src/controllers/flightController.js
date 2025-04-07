@@ -1,3 +1,4 @@
+import redisClient from '../config/redisClient.js';
 import redis from "../config/redis.js";
 import Flight from "../models/Flight.js";
 import Booking from "../models/Booking.js";

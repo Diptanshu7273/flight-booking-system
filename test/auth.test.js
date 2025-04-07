@@ -1,5 +1,5 @@
+import app from '../src/app.js';
 import request from 'supertest';
-import app from '../app.js'; // adjust path if needed
 import User from '../src/models/User.js'; // ✅ Add this line
 
 beforeAll(async () => {

@@ -1,5 +1,5 @@
 import express from "express";
-import { authMiddleware, adminMiddleware } from "../middlewares/authMiddleware.js";
+import { authMiddleware, adminMiddleware } from "../middleware/authMiddleware.js";
 import { addFlight, updateFlight, deleteFlight, getFlights, searchFlights } from "../controllers/flightController.js";
 
 const router = express.Router();

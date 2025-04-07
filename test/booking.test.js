@@ -1,31 +1,42 @@
+import app from '../src/app.js';
 import request from 'supertest';
-import app from '../app.js';
+import { User } from '../src/models'; // Update path if needed
 
 describe('Booking routes', () => {
   let token;
 
   beforeAll(async () => {
-    const loginRes = await request(app)
-      .post('/api/auth/login')
-      .send({ email: 'testuser@example.com', password: 'testpass123' });
+    // Register the test user
+    await request(app).post('/api/register').send({
+      email: 'testuser@example.com',
+      password: 'testpass123',
+      name: 'Test User'
+    });
 
-    console.log("Login Status:", loginRes.statusCode);
-    console.log("Login Body:", loginRes.body);
+    // Now login to get the JWT token
+    const loginRes = await request(app).post('/api/login').send({
+      email: 'testuser@example.com',
+      password: 'testpass123'
+    });
 
     token = loginRes.body.token;
+    console.log("✅ Token retrieved:", token);
   });
 
   test('should allow booking with valid token', async () => {
-    console.log("Token:", token); // ✅ Log token to ensure it's set
-
     const res = await request(app)
       .post('/api/bookings')
       .set('Authorization', `Bearer ${token}`)
       .send({ flightId: 1, seats: 2 });
 
-    console.log("Status:", res.statusCode);
-    console.log("Body:", res.body);
+    console.log("📦 Booking Status:", res.statusCode);
+    console.log("📦 Booking Body:", res.body);
 
     expect([200, 201]).toContain(res.statusCode);
+  });
+
+  afterAll(async () => {
+    // Clean up test user
+    await User.destroy({ where: { email: 'testuser@example.com' } });
   });
 });
