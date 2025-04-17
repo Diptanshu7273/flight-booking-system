@@ -1,5 +1,4 @@
-import redisClient from '../config/redisClient.js';
-import redis from "../config/redis.js";
+import redisClient from "../config/redisClient.js";
 import Flight from "../models/Flight.js";
 import Booking from "../models/Booking.js";
 import User from "../models/User.js";
@@ -7,9 +6,9 @@ import { publishToQueue } from "../utils/rabbitmq.js";
 
 const clearFlightCache = async (flight) => {
   const pattern = `flights:${flight.source}:${flight.destination}:*`;
-  const keys = await redis.keys(pattern);
+  const keys = await redisClient.keys(pattern);
   if (keys.length > 0) {
-    await redis.del(keys);
+    await redisClient.del(keys);
   }
 };
 
@@ -99,12 +98,12 @@ export const deleteFlight = async (req, res) => {
 
 // SEARCH flights (with Redis caching)
 export const searchFlights = async (req, res) => {
-  const { source, destination, date, page = 1, limit = 10 } = req.query;
+  const { source, destination, date = "", page = 1, limit = 10 } = req.query;
   const offset = (page - 1) * limit;
-  const cacheKey = `flights:${source}:${destination}:${date}:page:${page}:limit:${limit}`;
+  const cacheKey = `flights:${source}:${destination}:${date || "any"}:page:${page}:limit:${limit}`;
 
   try {
-    const cached = await redis.get(cacheKey);
+    const cached = await redisClient.get(cacheKey);
     if (cached) {
       console.log("🔁 Served from cache");
       return res.status(200).json(JSON.parse(cached));
@@ -117,7 +116,7 @@ export const searchFlights = async (req, res) => {
       order: [["departure_time", "ASC"]],
     });
 
-    await redis.set(cacheKey, JSON.stringify(flights), "EX", 300);
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(flights));
     res.status(200).json(flights);
   } catch (error) {
     console.error("❌ Flight search error:", error.message);
@@ -125,6 +124,7 @@ export const searchFlights = async (req, res) => {
   }
 };
 
+// UPDATE flight status (real-time broadcast)
 export const updateFlightStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -136,7 +136,7 @@ export const updateFlightStatus = async (req, res) => {
     flight.status = status;
     await flight.save();
 
-    // Emit to all clients
+    // Emit to all clients via WebSocket
     const io = req.app.get("io");
     io.emit("flight-status-update", {
       flightId: flight.id,

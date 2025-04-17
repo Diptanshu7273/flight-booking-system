@@ -16,6 +16,10 @@ const Flight = sequelize.define("Flight", {
     type: DataTypes.DATE,
     defaultValue: Sequelize.literal("CURRENT_TIMESTAMP")
   },
+  date: {
+    type: Sequelize.DATE,  // Or Sequelize.DATEONLY if you only need the date
+    allowNull: false,      // Set to true if the field is optional
+  },
 }, {
   tableName: "flights",
   timestamps: false

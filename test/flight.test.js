@@ -2,12 +2,11 @@
 import { jest } from '@jest/globals';
 
 // ✅ Mock the Redis client to avoid real connection issues
-jest.unstable_mockModule('../src/config/redisClient.js', () => ({
-  default: {
-    get: jest.fn().mockResolvedValue(null), // No cache
-    setEx: jest.fn().mockResolvedValue('OK') // Pretend caching succeeded
-  }
+jest.mock('../src/config/redisClient.js', () => ({
+  get: jest.fn(),
+  setEx: jest.fn()
 }));
+
 
 // ✅ Import everything AFTER the mock
 import request from 'supertest';

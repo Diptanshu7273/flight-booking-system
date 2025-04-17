@@ -1,6 +1,7 @@
+import { jest } from '@jest/globals';  // Import jest for ES module support
 import request from 'supertest';
 import app from '../src/app.js';
-import { User } from '../src/models/index.js';
+import { User } from '../src/models/index.js'; // Importing the User model
 
 describe('Admin routes', () => {
   let adminToken, userToken;
@@ -11,24 +12,24 @@ describe('Admin routes', () => {
       email: 'admin@example.com',
       password: 'adminpass123',
       name: 'Admin User',
-      role: 'admin'
+      role: 'admin',
     });
 
     await request(app).post('/api/register').send({
       email: 'user@example.com',
       password: 'userpass123',
-      name: 'Normal User'
+      name: 'Normal User',
     });
 
     const adminLogin = await request(app).post('/api/login').send({
       email: 'admin@example.com',
-      password: 'adminpass123'
+      password: 'adminpass123',
     });
     adminToken = adminLogin.body.token;
 
     const userLogin = await request(app).post('/api/login').send({
       email: 'user@example.com',
-      password: 'userpass123'
+      password: 'userpass123',
     });
     userToken = userLogin.body.token;
   });
@@ -56,6 +57,15 @@ describe('Admin routes', () => {
   });
 
   afterAll(async () => {
-    await User.destroy({ where: { email: ['admin@example.com', 'user@example.com'] } });
+    await User.destroy({
+      where: {
+        email: ['admin@example.com', 'user@example.com'],
+      },
+    });
+  
+    // Optional: if you're using Sequelize, close connection
+    if (User.sequelize) {
+      await User.sequelize.close();
+    }
   });
 });
